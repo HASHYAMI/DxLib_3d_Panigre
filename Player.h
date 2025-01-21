@@ -101,7 +101,6 @@ private:
 
 	Weapon* weaponPtr;
 
-
 	int handFrameIndex;
 
 	float CameraLenght = 0.0f;
