@@ -1,0 +1,16 @@
+﻿  Player.cpp
+D:\進級制作_2年\Player.cpp(23,33): warning C4305: '引数': 'double' から 'float' へ切り詰めます。
+D:\進級制作_2年\Player.cpp(87,29): warning C4244: '引数': 'double' から 'float' への変換です。データが失われる可能性があります。
+D:\進級制作_2年\Player.cpp(88,29): warning C4244: '引数': 'double' から 'float' への変換です。データが失われる可能性があります。
+D:\進級制作_2年\Player.cpp(95,29): warning C4244: '引数': 'double' から 'float' への変換です。データが失われる可能性があります。
+D:\進級制作_2年\Player.cpp(96,29): warning C4244: '引数': 'double' から 'float' への変換です。データが失われる可能性があります。
+D:\進級制作_2年\Player.cpp(200,12): warning C4553: '==': 式の結果が使用されていません。'=' を意図していますか?
+D:\進級制作_2年\Player.cpp(203,12): warning C4244: '=': 'float' から 'int' への変換です。データが失われる可能性があります。
+D:\進級制作_2年\Player.cpp(207,13): warning C4244: '=': 'float' から 'int' への変換です。データが失われる可能性があります。
+D:\進級制作_2年\Player.cpp(211,13): warning C4244: '=': 'float' から 'int' への変換です。データが失われる可能性があります。
+D:\進級制作_2年\Player.cpp(215,12): warning C4244: '=': 'double' から 'int' への変換です。データが失われる可能性があります。
+D:\進級制作_2年\Player.cpp(219,12): warning C4244: '=': 'double' から 'int' への変換です。データが失われる可能性があります。
+D:\進級制作_2年\Player.cpp(223,13): warning C4244: '=': 'double' から 'int' への変換です。データが失われる可能性があります。
+D:\進級制作_2年\Player.cpp(226): warning C4554: '&': 演算子の優先順位に問題があります。かっこを使用して優先順位を明確にしてください
+D:\進級制作_2年\Player.cpp(228,12): warning C4244: '=': 'double' から 'int' への変換です。データが失われる可能性があります。
+  進級制作_2年.vcxproj -> D:\進級制作_2年\x64\Debug\進級制作_2年.exe
