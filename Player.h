@@ -12,7 +12,7 @@
 #include "Camera.h"
 
 #define JUMPOWER 16.0f;
-#define GRAVITY 1.0f;
+#define GRAVITY 1.f;
 
 #define D2R(deg) ((deg)*DX_PI_F/180.f)	//?
 
@@ -29,6 +29,14 @@ public:
 
 	int PlayerHandle;
 
+	//! コライダーの始点
+	int colStartPos;
+	//! コライダーの終点
+	int colEndPos;
+	//! コライダーの半径
+	float radius;
+
+
 	VECTOR Position;
 	VECTOR CameraPos;
 	VECTOR CameraAngle;
@@ -39,6 +47,7 @@ public:
 	void Update();
 	void Draw();
 	void OnCollisionHit(Collider* colliderPtr, GameObject* gobjPtr);	//コリジョン判定でヒットした時のコールバック関数
+	//void CheckCollision();
 
 	_CollisionRect GetCollisionRect() 
 	{
@@ -91,7 +100,7 @@ public:
 		//IsGoundHit = flag;
 	}
 
-	//Weapom* GetWeapon() { return WeaponPtr; }
+	Weapon* GetWeapon() { return weaponPtr; }
 
 private:
 	int MHandle;
@@ -100,7 +109,6 @@ private:
 	Animator* animatorPtr;
 
 	Weapon* weaponPtr;
-
 
 	int handFrameIndex;
 

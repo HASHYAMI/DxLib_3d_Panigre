@@ -1,20 +1,22 @@
 #include "Player.h"
 #include "Camera.h"
+#include "Collider.h"
+
 static vector <AnimationInfo> animInfo =
 {
-	{0,"fillPath",true},	//Idle
-	{1,"fillPath",false},	//Wallk_?
-	{2,"fillPath",false},	//Dash
+	{0,"Assets/Character/Idle.mv1",true},	//Idle
+	{1,"Assets/Character/Running.mv1",false},	//Wallk_?
+	{2,"Assets/Character/jumping.mv1",false},	//Dash
 	//{3,"fillPath",false},	//Atack_1
 	//{4,"fillPath",false},	//Attack_2
 	//{5,"fillPath",false},	//Attack_3
 	//{6,"",false},			//jump
-	//{7,"",false},			//other_00
+	//{7,"",false},			//other_0
 };
 
 Player::Player() 
 {
-	MHandle = MV1LoadModel("Assets/test/human.mv1");
+	MHandle = MV1LoadModel("Assets/test/human_Mxsamo.mv1");
 
 	//if (MHandle == -1)
 	//	return;
@@ -23,12 +25,20 @@ Player::Player()
 	rotation = VGet(0.f, DX_PI, 0.f);
 	scale = VGet(1.f,1.f,1.f);
 	name = "Player";
-
+	
 	anim_id = 0;		//アイドル
 	animatorPtr = new Animator();
 	animatorPtr->Load(animInfo);
 
 	forward = VGet(0.f,0.f,-1.f);
+
+	//
+	// コライダー情報の初期化
+	//
+	colStartPos = 5;
+	colEndPos = 0;
+	radius = 50.0f;
+
 
 	isWallHit = false;
 	IsAttack = false;
@@ -36,18 +46,17 @@ Player::Player()
 	IsRun = false;
 
 	//武器モデルの読み込み
-	WPHandle = MV1LoadModel("Assets/Weapon's/SAM_Blead.mv1");
+	WPHandle = MV1LoadModel("Assets/Weapon's/CreataPoint_Middle_2nd_SAM_Blead.mv1");
 
 	//武器を持たせる手のノードをキャラモデルから探す
-	handFrameIndex = MV1SearchFrame(MHandle, "Assets/Character/ModelFrameName");
+	//MV1SearchFrame(MHandle, "29");
 	
 	//MPHandle = MV1LoadModel("fill_Name");	//MAP
-
-	//handFrameIndex = MV1SearchFrame(MHandle, "Model_Rig or ModeleFrameName_Node");
 
 	weaponPtr = new Weapon();
 
 	camera = new Camera();
+
 }
 
 Player::~Player() 
@@ -55,6 +64,7 @@ Player::~Player()
 	MV1DeleteModel(MHandle);
 	MV1DeleteModel(WPHandle);	//武器ハンドル
 	delete animatorPtr;
+
 }
 
 //アングル操作処理
@@ -65,12 +75,15 @@ void Game_Init()
 
 void Player::move() 
 {
-	if (CheckHitKey(KEY_INPUT_W)) 
+	if (CheckHitKey(KEY_INPUT_W) && !isWallHit && !IsAttack && !IsRun) 
 	{
+		IsRun = true;
 		PlayerPos.x -= sinf(rotation.y) * 10.f;
 		PlayerPos.z -= cosf(rotation.y) * 10.f;
-		anim_id = 0;
+		anim_id = 1;
 		animatorPtr->Play(MHandle, anim_id);
+		
+		IsRun = false;
 	}
 
 	else if (CheckHitKey(KEY_INPUT_S) && !isWallHit && !IsAttack)
@@ -86,7 +99,7 @@ void Player::move()
 		rotation.y -= 0.0f;
 		PlayerPos.x -= cosf(DX_PI * rotation.z) * 5.0f;
 		PlayerPos.z += sinf(DX_PI * rotation.x) * 5.0f;
-		anim_id = 0;
+		anim_id = 1;
 	}
 
 	else if (CheckHitKey(KEY_INPUT_D) && !isWallHit && !IsAttack)
@@ -94,7 +107,17 @@ void Player::move()
 		rotation.y += 0.0f;
 		PlayerPos.x += cosf(DX_PI * rotation.z) * 5.0f;
 		PlayerPos.z -= sinf(DX_PI * rotation.x) * 5.0f;
-		//anim_id = 00;
+		anim_id = 1;
+	}
+
+	if (CheckHitKey(KEY_INPUT_SPACE) && !IsJump) 
+	{
+		//isJumpをtrueに
+		IsJump = true;
+		jumpPower += 20;
+		//void Player::Jumpに飛ぶ
+		Player::jump();
+
 	}
 
 	//斜め入力の際の処理
@@ -164,11 +187,12 @@ void Player::jump()
 		jumpPower -= GRAVITY;
 
 		PlayerPos.y += jumpPower;
+
 		if (PlayerPos.y <= GroundPos.y)
 		{
 			IsJump = false;
 			PlayerPos.y = GroundPos.y;
-			//IsGroundHit  true;
+			//IsGroundHit = true;
 		}
 	}
 
@@ -188,6 +212,7 @@ void Player::jump()
 
 	DrawFormatString(10, 200, 32000, "trans.y=%f", PlayerPos.y);
 
+	int a = IsJump;
 }
 
 void Player::Update() 
@@ -273,20 +298,29 @@ void Player::Update()
 	}
 	/**/
 
+	
+
 	//アニメーションの再生更新
 	animatorPtr->Update();
+
+	////武器描画
+	weaponPtr->Update();
 
 	MV1SetPosition(MHandle, PlayerPos);		//playerとカメラ
 	MV1DrawModel(MHandle);
 
-	//MATRIX wpMatrix = MV1GetFrameLocalMatrix(MHandle, handFrameIndex);
+	//
+	// コライダー描画
+	//
+	DrawCapsule3D(MV1GetFramePosition(MHandle, colStartPos), MV1GetFramePosition(MHandle, colEndPos), radius,
+		6, GetColor(0, 255, 0), GetColor(0, 255, 0),FALSE);
+
+	MATRIX WPMatrix = MV1GetFrameLocalMatrix(MHandle, handFrameIndex);
 
 	//武器のマトリクスとして適用
 	//weaponPtr->SetMatrix(WPMatrix);
-
-	//武器描画
-	weaponPtr->Update();
-
+	//
+	// 
 	// カメラの更新
 	camera->Update(PlayerPos);
 }
@@ -306,6 +340,8 @@ void Player::Draw()
 //武器判定
 void Player::OnCollisionHit(Collider* colliderPth, GameObject* gobjPtr) 
 {
+
+
 	//コリジョン判定でヒットした時に呼び出されるコールバック関数
 	//if (gobjPtr->tag_name.compare("Weapon"))
 	//{

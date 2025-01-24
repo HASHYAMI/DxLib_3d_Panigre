@@ -4,8 +4,12 @@
 Weapon::Weapon() 
 {
 
-	MHandle = MV1LoadModel("Assets/Weapon's/SAM_Blead.mv1");
-    int a = MHandle;
+	MHandle = MV1LoadModel("Assets/Weapon's/CreataPoint_Middle_2nd_SAM_Blead.mv1");
+
+    //コライダー定義
+    W_colStartPos = 0;
+    W_colEndPos = 0;
+    W_radius = 0;
 
 #if 1
 	colliderType = Collider::CAPSULE_TYPE;
@@ -43,12 +47,27 @@ Weapon::Weapon()
 #endif
 
 #if 1
-    int index = MV1SearchFrame(MHandle, "sword_top");
+    int index = MV1SearchFrame(MHandle, "Top");
     orgStartPos = MV1GetFramePosition(MHandle, index);
-    index = MV1SearchFrame(MHandle, "sowrd_midlle");
+    index = MV1SearchFrame(MHandle, "Midlle");
+    int index_2 = MV1SearchFrame(MHandle, "Midlle");
     orgEndPos = MV1GetFramePosition(MHandle, index);
+
+
+    ///*書き直し*/
+    //int index_1 = MV1SearchFrame(MHandle, "Top");        //TOPのフレームインデックス
+    //int index_2 = MV1SearchFrame(MHandle, "Middle");    //Middleのフレームインデックス
+    //int index_3 = MV1SearchFrame(MHandle, "Middle_2");  //Middle_2ndのフレームインデックス
+    //int index_4 = MV1SearchFrame(MHandle, "Under");     //Underのフレームインデックス
+
+    //orgStartPos = MV1GetFramePosition(MHandle, index_1);//TopからMiddleまでのコライダー
+    //EndPos = MV1GetFramePosition(MHandle, index_2);     //          "  "
+    //orgStartPos = MV1GetFramePosition(MHandle, index_2);//MiddleからMiddle_2ndまでのコライダー
+    //EndPos = MV1GetFramePosition(MHandle, index_3);     //          "  " 
+
+
 #else
-    int index = MV1SearchFrame(MHandle, "sword_top");
+    int index = MV1SearchFrame(MHandle, "Top");
     colliderType = Collider::BOX_TYPE;
     tag_name = "weapon";
 
@@ -57,7 +76,7 @@ Weapon::Weapon()
 
 Weapon::~Weapon() 
 {
-	
+    
 }
 
 void Weapon::Update() 
@@ -79,6 +98,13 @@ void Weapon::Update()
     maxPos = VTransform(maxPos, matrix);
     DrawLine3D(minPos, maxPos, GetColor(255, 255, 0));
 #endif
+
+    //
+    // コライダー描画
+    //
+    DrawCapsule3D(MV1GetFramePosition(MHandle, W_colStartPos), MV1GetFramePosition(MHandle, W_colEndPos), radius,
+        6, GetColor(0, 255, 0), GetColor(255, 0, 0), FALSE);
+
     Draw();
 }
 
@@ -89,6 +115,7 @@ void Weapon::Draw()
 
 void Weapon::OnCollisionHit(Collider* colliderPtr, GameObject* gobjPtr) 
 {
+    //
 	if (gobjPtr ->tag_name.compare("Player"))
 	{
 		int a = 0;

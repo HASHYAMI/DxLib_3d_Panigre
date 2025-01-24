@@ -39,7 +39,7 @@ public:
 private:
 	int res_Handle;
 
-	int videoHandle = LoadGraph("Assets/.mp4/Zilaffe25fps.mp4");		//確認用
+	int videoHandle = LoadGraph("Assets/mp4/Zilaffe25fps.mp4");		//確認用
 
 	void chk_Collision_t();
 };
